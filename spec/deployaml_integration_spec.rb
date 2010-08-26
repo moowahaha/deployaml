@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
 
 describe Deployaml do
   before do
-    FileUtils.rm_r('/tmp/basic_test_project_destination') if File.exists?(File.dirname(__FILE__) + '/basic_test_project_destination')
-    FileUtils.cp_r(File.dirname(__FILE__) + '/basic_test_project', '/tmp/', :remove_destination => true)
-    FileUtils.cd(File.dirname(__FILE__) + '/basic_test_project')
+    FileUtils.rm_r('/tmp/basic_test_project_destination') if File.exists?('/tmp/basic_test_project_destination')
+    FileUtils.cp_r(File.dirname(__FILE__) + '/../fixtures/basic_test_project', '/tmp/', :remove_destination => true)
+    FileUtils.cd(File.dirname(__FILE__) + '/../fixtures/basic_test_project')
 
     fake_now = 'current time'
     Time.should_receive(:now).and_return(fake_now)

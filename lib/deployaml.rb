@@ -4,7 +4,7 @@ class Deployaml
   class << self
     def go!
       load_yaml
-      
+
       repository_path = @yaml['repository']['path']
       raise "Cannot find repository #{repository_path}" unless File.exists?(repository_path)
 
@@ -19,8 +19,7 @@ class Deployaml
                 destination_path
         )
 
-        File.unlink(current_symlink)
-
+        File.unlink(current_symlink) if File.exists?(current_symlink)
         File.symlink(destination_path, current_symlink)
       end
     end
