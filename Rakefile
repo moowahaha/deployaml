@@ -9,7 +9,7 @@ Hoe.plugin :newgem
 $hoe = Hoe.spec 'deployaml' do
   self.developer 'Stephen Hardisty', 'moowahaha@hotmail.com'
   self.rubyforge_name = self.name
-  self.extra_deps = [[]]
+  #self.extra_deps = [['blah', '>= 0.0']]
 end
 
 require 'newgem/tasks'

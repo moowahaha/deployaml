@@ -1,3 +1,3 @@
 class Deployaml
-  #Code here
+    VERSION = '0.0'
 end

@@ -1,0 +1,6 @@
+History.txt
+Manifest.txt
+README.rdoc
+Rakefile
+bin/deployaml
+lib/deployaml.rb
