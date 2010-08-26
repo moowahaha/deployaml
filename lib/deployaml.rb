@@ -3,14 +3,12 @@ class Deployaml
 
   class << self
     def go!
-      yaml_file = File.join(Dir.pwd, 'deplo.yml')
-      raise "Cannot find deployment YAML file #{yaml_file}" unless File.exists?(yaml_file)
-      yaml = YAML.load_file(yaml_file)
-
-      repository_path = yaml['repository']['path']
+      load_yaml
+      
+      repository_path = @yaml['repository']['path']
       raise "Cannot find repository #{repository_path}" unless File.exists?(repository_path)
 
-      yaml['destinations'].each do |destination|
+      @yaml['destinations'].each do |destination|
         FileUtils.mkdir_p(File.join(destination['path'], 'releases'))
 
         destination_path = File.join(destination['path'], 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
@@ -25,6 +23,14 @@ class Deployaml
 
         File.symlink(destination_path, current_symlink)
       end
+    end
+
+    private
+
+    def load_yaml
+      yaml_file = File.join(Dir.pwd, 'deplo.yml')
+      raise "Cannot find deployment YAML file #{yaml_file}" unless File.exists?(yaml_file)
+      @yaml = YAML.load_file(yaml_file)
     end
   end
 end
