@@ -1,0 +1,6 @@
+repository:
+  path: /tmp/basic_test_project
+
+destinations:
+  - &dest
+    path: /tmp/basic_test_project_destination
