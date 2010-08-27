@@ -15,7 +15,7 @@ describe Deployaml do
     end
 
     it "should raise a powerful objection to a nonexistent repository" do
-      YAML.should_receive(:load_file).and_return({'repository' => {'path' => '/xyz/blah'}})
+      YAML.should_receive(:load_file).and_return([{'repository' => {'path' => '/xyz/blah'}}])
 
       lambda { Deployaml.go! }.should raise_error('Cannot find repository /xyz/blah')
     end
