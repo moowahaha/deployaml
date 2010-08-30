@@ -1,15 +1,13 @@
 module Deployaml
-  module Tasks
+  module PreInstall
     class WriteStringToFile
-      class << self
 
-        def run path, params
-          File.open(params['file'], 'w') do |fh|
-            fh.write(params['string'])
-          end
+      def run deployment, params
+        File.open(File.join(deployment.staging_path, params['file']), 'w') do |fh|
+          fh.write(params['string'])
         end
-
       end
+
     end
   end
 end

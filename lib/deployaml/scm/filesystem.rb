@@ -1,12 +1,12 @@
-require File.dirname(__FILE__) + '/scm_base'
+require File.dirname(__FILE__) + '/../scm_base'
 
 module Deployaml
   module Scm
     class Filesystem < ScmBase
       def fetch_files
-        raise "Cannot read repository #{repository_path}" unless File.exists?(repository_path)
+        raise "Cannot read repository #{deployment.repository_path} for '#{deployment.name}'" unless File.exists?(deployment.repository_path)
 
-        FileUtils.cp_r(repository_path, staging_root, :remove_destination => true)
+        FileUtils.cp_r(deployment.repository_path, File.dirname(deployment.staging_path), :remove_destination => true)
       end
     end
   end

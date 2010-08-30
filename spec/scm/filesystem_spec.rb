@@ -10,11 +10,14 @@ describe Deployaml::Scm::Filesystem do
   end
 
   it "should stage a copy of the repo" do
-    FileUtils.rm_r("/tmp/dick") if File.exist?("/tmp/dick")
-    FileUtils.mkdir('/tmp/dick')
+    deployment = Deployaml::Deployment.new(
+            'name' => 'harold',
+            'repository' => {'path' => @example_repo},
+            'destinations' => [{'path' => '/tmp/'}]
+    )
 
-    @scm.stage(@example_repo, '/tmp/dick')
+    @scm.stage(deployment)
 
-    File.should exist(@example_repo + '/harold.txt')
+    File.should exist(deployment.staging_path + '/harold.txt')
   end
 end

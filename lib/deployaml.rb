@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'tmpdir'
 
 Dir.glob(File.join(File.dirname(__FILE__), 'deployaml', '**', '*.rb')).each do |file|
   require file
@@ -9,45 +8,81 @@ module Deployaml
   class Runner
     VERSION = '0.0'
 
-    class << self
-      def go!
-        deployments.each do |deployment|
-          deployment_name = deployment['name'] || raise("Deployment has no name")
-          repository_path = deployment['repository']['path']
+    def initialize
+      load_scm
+      load_pre_install_tasks
+    end
 
-          scm = Deployaml.const_get('Scm').const_get((deployment['repository']['scm'] || 'filesystem').capitalize).new
-          scm.stage(deployment['repository']['path'], staging_directory)
+    def go!
+      deployments.each do |deployment|
+        scm = concrete_scm(deployment)
+        scm.stage(deployment)
 
-          deployment['destinations'].each do |destination|
-            FileUtils.mkdir_p(File.join(destination['path'], 'releases'))
+        run_pre_install_tasks(deployment)
 
-            destination_path = File.join(destination['path'], 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
-            current_symlink = File.join(destination['path'], 'current')
+        deployment.destinations.each do |destination|
+          FileUtils.mkdir_p(File.join(destination.path, 'releases'))
 
-            FileUtils.cp_r(
-                    File.join(staging_directory, File.basename(deployment['repository']['path'])),
-                    destination_path
-            )
+          destination_path = File.join(destination.path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
+          current_symlink = File.join(destination.path, 'current')
 
-            File.unlink(current_symlink) if File.exists?(current_symlink)
-            File.symlink(destination_path, current_symlink)
-          end
+          FileUtils.cp_r(
+                  deployment.staging_path,
+                  destination_path
+          )
+
+          File.unlink(current_symlink) if File.exists?(current_symlink)
+          File.symlink(destination_path, current_symlink)
         end
       end
+    end
 
-      private
+    private
 
-      def staging_directory
-        dir = File.join(Dir.tmpdir, 'deployaml')
-        FileUtils.mkdir(dir) unless File.directory?(dir)
-        dir
+    def children_of constant
+      classes = {}
+
+      Deployaml.const_get(constant).constants.each do |scm|
+        underscore_name = scm.gsub(/[A-Z]/) {|x| '_' + x.downcase}.gsub(/^_/, '')
+        classes[underscore_name] = Deployaml.const_get(constant).const_get(scm).new
       end
 
-      def deployments
-        yaml_file = File.join(Dir.pwd, 'deplo.yml')
-        raise "Cannot find deployment YAML file #{yaml_file}" unless File.exists?(yaml_file)
-        YAML.load_file(yaml_file)
+      classes
+    end
+
+    def find_class_from_collection collection, nice_collection_type, nice_class, deployment
+      klass = collection.find {|x| x[0] == nice_class}
+      
+      return klass[1] if klass
+
+      raise "Do not know of #{nice_collection_type} '#{nice_class}' for '#{deployment.name}'. Available: #{collection.keys.sort.join(', ')}"
+    end
+
+    def concrete_scm deployment
+      find_class_from_collection(@scms, 'scm', deployment.scm, deployment)
+    end
+
+    def load_scm
+      @scms = children_of 'Scm'
+    end
+
+    def load_pre_install_tasks
+      @pre_install = children_of 'PreInstall'
+    end
+
+    def run_pre_install_tasks deployment
+      return if deployment.pre_install_tasks.nil? || deployment.pre_install_tasks.empty?
+
+      deployment.pre_install_tasks.each do |task|
+        task_klass = find_class_from_collection(@pre_install, 'pre_install', task['task'], deployment)
+        task_klass.run(deployment, task['parameters'])
       end
+    end
+
+    def deployments
+      yaml_file = File.join(Dir.pwd, 'deplo.yml')
+      raise "Cannot find deployment YAML file #{yaml_file}" unless File.exists?(yaml_file)
+      YAML.load_file(yaml_file).map {|d| Deployaml::Deployment.new(d) }.compact
     end
   end
 end

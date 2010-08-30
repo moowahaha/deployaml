@@ -10,12 +10,15 @@ describe Deployaml::Scm::Git do
   end
 
   it "should clone a git repo" do
-    FileUtils.rm_r("/tmp/harry") if File.exist?("/tmp/harry")
-    FileUtils.mkdir('/tmp/harry')
+    deployment = Deployaml::Deployment.new(
+            'name' => 'harold',
+            'repository' => {'path' => @example_repo},
+            'destinations' => [{'path' => '/tmp/'}]
+    )
 
-    @scm.stage(@example_repo, '/tmp/harry')
+    @scm.stage(deployment)
 
-    File.should exist('/tmp/harry/local_git_deployment_test_repo/benjamin.txt')
-    File.should_not exist('/tmp/harry/local_git_deployment_test_repo/.git/')
+    File.should exist(deployment.staging_path + '/benjamin.txt')
+    File.should_not exist(deployment.staging_path + '/.git/')
   end
 end

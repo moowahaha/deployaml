@@ -2,28 +2,84 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
 
 describe Deployaml do
 
-  context 'errors' do
+  before do
+    FileUtils.rm_r('/tmp/local_deployment_test_project_destination') if File.exists?('/tmp/local_deployment_test_project_destination')
+    FileUtils.cp_r(File.dirname(__FILE__) + '/../fixtures/local_deployment_test_project', '/tmp/', :remove_destination => true)
+  end
 
-    before do
-      FileUtils.touch('deplo.yml')
+  it "should raise a meaningful exception when the deplo.yml file doesn't exist" do
+    Dir.should_receive(:pwd).and_return('/xyz/')
+
+    lambda { Deployaml::Runner.new.go! }.should raise_error('Cannot find deployment YAML file /xyz/deplo.yml')
+  end
+
+  it "should build a deployment from the deplo.yaml file" do
+    YAML.should_receive(:load_file).and_return([{
+            'name' => 'aa',
+            'repository' => {'path' => '/tmp/local_deployment_test_project'},
+            'destinations' => [
+                    {
+                            'path' => '/tmp/local_deployment_test_project_destination'
+                    }
+            ]
+    }])
+
+    Deployaml::Deployment.should_receive(:new).with({
+            'name' => 'aa',
+            'repository' => {'path' => '/tmp/local_deployment_test_project'},
+            'destinations' => [
+                    {
+                            'path' => '/tmp/local_deployment_test_project_destination'
+                    }
+            ]
+    }).and_return(nil)
+
+    Deployaml::Runner.new.go!
+  end
+
+  context "pre install tasks" do
+    it "should run specified tasks" do
+      contents = rand
+
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'pre_install' => [
+                      {
+                              'task' => 'write_string_to_file',
+                              'parameters' => {
+                                      'file' => 'blah.txt',
+                                      'string' => contents
+                              }
+                      }
+              ],
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
+
+      Deployaml::Runner.new.go!
+      File.read("#{Dir.tmpdir}/deployaml/local_deployment_test_project/blah.txt").should == contents.to_s
+      File.read('/tmp/local_deployment_test_project_destination/current/blah.txt').should == contents.to_s
     end
 
-    it "should raise a meaningful exception when the deplo.yml file doesn't exist" do
-      Dir.should_receive(:pwd).and_return('/xyz/')
+    it "should raise an error if it does not know of a pre-install task" do
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'pre_install' => [
+                      {'task' => 'moooo'}
+              ],
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
 
-      lambda { Deployaml::Runner.go! }.should raise_error('Cannot find deployment YAML file /xyz/deplo.yml')
-    end
-
-    it "should raise an angry exception when no name is specified for a deployment" do
-      YAML.should_receive(:load_file).and_return([{}])
-
-      lambda { Deployaml::Runner.go! }.should raise_error('Deployment has no name')
-    end
-
-    it "should raise a powerful objection to a nonexistent repository" do
-      YAML.should_receive(:load_file).and_return([{'name' => 'aa', 'repository' => {'path' => '/xyz/blah'}}])
-
-      lambda { Deployaml::Runner.go! }.should raise_error('Cannot read repository /xyz/blah')
+      lambda { Deployaml::Runner.new.go! }.should raise_error(/Do not know of pre_install 'moooo' for 'aa'/)
     end
 
   end

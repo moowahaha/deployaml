@@ -15,7 +15,7 @@ describe Deployaml do
       Time.should_receive(:now).and_return(fake_now)
       fake_now.should_receive(:strftime).with('%Y%M%d%H%M%S').and_return '20105726195752'
 
-      Deployaml::Runner.go!
+      Deployaml::Runner.new.go!
     end
 
     it "should copy the archive of the repo" do
