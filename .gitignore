@@ -1,4 +1,4 @@
 .idea/
 reports
 pkg
-./deplo.yml
+/deplo.yml
