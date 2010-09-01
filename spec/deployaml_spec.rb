@@ -61,6 +61,7 @@ describe Deployaml do
       }])
 
       Deployaml::Runner.new.go!
+
       File.read("#{Dir.tmpdir}/deployaml/local_deployment_test_project/blah.txt").should == contents.to_s
       File.read('/tmp/local_deployment_test_project_destination/current/blah.txt').should == contents.to_s
     end
@@ -82,6 +83,25 @@ describe Deployaml do
       lambda { Deployaml::Runner.new.go! }.should raise_error(/Do not know of pre_install 'moooo' for 'aa'/)
     end
 
+  end
+
+  context "installing" do
+    it "should install to a destination from a staging path" do
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
+
+      fake_destination = mock('destination')
+      Deployaml::Destination.should_receive(:new).and_return(fake_destination)
+      fake_destination.should_receive(:install_from).with(File.join(Dir.tmpdir, 'deployaml', 'local_deployment_test_project'))
+      Deployaml::Runner.new.go!
+    end
   end
 
 end

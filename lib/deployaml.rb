@@ -21,18 +21,7 @@ module Deployaml
         run_pre_install_tasks(deployment)
 
         deployment.destinations.each do |destination|
-          FileUtils.mkdir_p(File.join(destination.path, 'releases'))
-
-          destination_path = File.join(destination.path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
-          current_symlink = File.join(destination.path, 'current')
-
-          FileUtils.cp_r(
-                  deployment.staging_path,
-                  destination_path
-          )
-
-          File.unlink(current_symlink) if File.exists?(current_symlink)
-          File.symlink(destination_path, current_symlink)
+          destination.install_from deployment.staging_path
         end
       end
     end
