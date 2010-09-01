@@ -1,0 +1,8 @@
+- &basic
+  name: bozo
+  repository:
+    path: /tmp/local_deployment_test_project
+
+  destinations:
+    - &dest
+      path: /tmp/local_deployment_test_project_destination

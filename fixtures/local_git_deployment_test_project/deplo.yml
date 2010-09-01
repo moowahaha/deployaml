@@ -1,0 +1,9 @@
+- &localgit
+  name: sexy
+  repository:
+    path: /tmp/local_git_deployment_test_repo
+    scm: git
+
+  destinations:
+    - &dest
+      path: /tmp/local_git_deployment_test_project_destination
