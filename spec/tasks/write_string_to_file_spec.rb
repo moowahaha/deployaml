@@ -23,6 +23,6 @@ describe Deployaml::PreInstall::WriteStringToFile do
             }
     )
 
-    File.read('/tmp/moomin').should == 'hello'
+    File.read("#{Dir.tmpdir}/deployaml/tmp/moomin").should == 'hello'
   end
 end
