@@ -9,7 +9,7 @@ Hoe.plugin :newgem
 $hoe = Hoe.spec 'deployaml' do
   self.developer 'Stephen Hardisty', 'moowahaha@hotmail.com'
   self.rubyforge_name = self.name
-  #self.extra_deps = [['blah', '>= 0.0']]
+  self.extra_deps = [['net-ssh', '>= 2.0.11'], ['net-scp', '>= 1.0.3']]
 end
 
 require 'newgem/tasks'

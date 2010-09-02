@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
 describe Deployaml::Destination do
   context 'errors' do
     it "should throw a wobbler when no path is specified" do
-      lambda {Deployaml::Destination.new({})}.should raise_error('A destination path must be specified')
+      lambda { Deployaml::Destination.new({}) }.should raise_error('A destination path must be specified')
     end
   end
 
@@ -31,7 +31,26 @@ describe Deployaml::Destination do
 
     it "should symlink the current runner to the spanking new release" do
       File.should be_symlink("/tmp/destination_spec_test_dir/current")
-      File.should exist("/tmp/destination_spec_test_dir/current/harold.txt")      
+      File.should exist("/tmp/destination_spec_test_dir/current/harold.txt")
+    end
+
+    it "should execute a shell command" do
+      destination = Deployaml::Destination.new('path' => @destination_dir)
+      destination.exec('pwd').should == Dir.pwd + "\n"
+    end
+  end
+
+  context "remote destination" do
+    it "should open an ssh session on a remote host" do
+      remote = YAML.load_file(File.dirname(__FILE__) + '/../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
+
+      destination = Deployaml::Destination.new(
+              {
+                      'path' => '/tmp/blah'
+              }.merge(remote)
+      )
+
+      destination.exec('whoami').should == remote['username'] + "\n"
     end
   end
 end
