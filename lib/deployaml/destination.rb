@@ -1,20 +1,28 @@
-require 'net/ssh'
-require 'net/scp'
-require 'open3'
-require 'forwardable'
-
 module Deployaml
   class Destination
-    extend Forwardable
-
-    def_delegators :@delegatee, :exec_and_verify, :install_from, :path
+    attr_reader :path
 
     def initialize params
-      params['path'] || raise("A destination path must be specified")
-      
+      @path = params['path'] || raise("A destination path must be specified")
+
       @delegatee = params.has_key?('host') ?
               Deployaml::RemoteDestination.new(params) :
               Deployaml::LocalDestination.new(params)
+    end
+
+    def install_from local_path
+      FileUtils.mkdir_p(File.join(path, 'releases'))
+
+      destination_path = File.join(path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
+      current_symlink = File.join(path, 'current')
+
+      FileUtils.cp_r(
+              local_path,
+              destination_path
+      )
+
+      File.unlink(current_symlink) if File.exists?(current_symlink)
+      File.symlink(destination_path, current_symlink)
     end
 
     def exec command

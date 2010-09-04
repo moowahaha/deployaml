@@ -1,9 +1,8 @@
+require 'open3'
+
 module Deployaml
   class LocalDestination
-    attr_reader :path
-
     def initialize params
-      @path = params['path']
     end
 
     def execute_and_verify(command, extra_command, ok_message)
@@ -29,21 +28,6 @@ module Deployaml
       end
 
       return had_error, output
-    end
-
-    def install_from local_path
-      FileUtils.mkdir_p(File.join(path, 'releases'))
-
-      destination_path = File.join(path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
-      current_symlink = File.join(path, 'current')
-
-      FileUtils.cp_r(
-              local_path,
-              destination_path
-      )
-
-      File.unlink(current_symlink) if File.exists?(current_symlink)
-      File.symlink(destination_path, current_symlink)
     end
 
   end

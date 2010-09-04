@@ -1,9 +1,9 @@
+require 'net/ssh'
+require 'net/scp'
+
 module Deployaml
   class RemoteDestination
-    attr_reader :path
-
     def initialize params
-      @path = params['path']
       params['host'] || raise('A remote host must be specified')
       ssh_connect(params)
     end
