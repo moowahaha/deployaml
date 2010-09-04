@@ -11,18 +11,16 @@ module Deployaml
     end
 
     def install_from local_path
-      FileUtils.mkdir_p(File.join(path, 'releases'))
+      exec("mkdir -p #{File.join(path, 'releases')}")
 
       destination_path = File.join(path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
       current_symlink = File.join(path, 'current')
 
-      FileUtils.cp_r(
-              local_path,
-              destination_path
-      )
+      # TODO: replace this with a @delegatee.copy
+      FileUtils.cp_r(local_path, destination_path)
 
-      File.unlink(current_symlink) if File.exists?(current_symlink)
-      File.symlink(destination_path, current_symlink)
+      exec("rm -f #{current_symlink}")
+      exec("ln -s #{destination_path} #{current_symlink}")
     end
 
     def exec command
@@ -30,7 +28,9 @@ module Deployaml
 
       extra_command = " && echo #{ok_message}"
 
+      puts "$ #{command}"
       had_error, output = @delegatee.execute_and_verify(command, extra_command, ok_message)
+      puts "\n"      
 
       raise "Error executing '#{command}'" if had_error
 
