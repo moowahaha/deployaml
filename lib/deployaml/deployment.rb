@@ -1,5 +1,7 @@
 require 'tmpdir'
 require File.join(File.dirname(__FILE__), 'destination')
+require File.join(File.dirname(__FILE__), 'local_destination')
+require File.join(File.dirname(__FILE__), 'remote_destination')
 
 module Deployaml
   class Deployment

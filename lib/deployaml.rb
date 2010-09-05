@@ -13,6 +13,14 @@ module Deployaml
       load_pre_install_tasks
     end
 
+    def all_scms
+      @scms.keys.sort
+    end
+
+    def all_pre_install
+      @pre_install.keys.sort
+    end
+
     def go!
       deployments.each do |deployment|
         scm = concrete_scm(deployment)

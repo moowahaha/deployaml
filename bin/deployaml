@@ -1,2 +1,52 @@
 #!/usr/bin/env ruby
+
+# == Synopsis
+#
+# deployaml: deploys your project using the details form a deplo.yml file in the current directory
+#
+# == Usage
+#
+# deployaml [OPTION]
+#
+# -h, --help:
+#    show help
+#
+# -l --list:
+#    list available pre install tasks, post install tasks and source control systems
+
 $:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
+
+require 'getoptlong'
+require 'rdoc/usage'
+require 'deployaml'
+
+opts = GetoptLong.new(
+        ['--help', '-h', GetoptLong::NO_ARGUMENT],
+        ['--list', '-l', GetoptLong::OPTIONAL_ARGUMENT]
+)
+
+list = false
+
+opts.each do |opt, arg|
+  case opt
+    when '--help'
+      RDoc::usage
+      exit 0
+    when '--list'
+      list = true
+  end
+end
+
+deployaml = Deployaml::Runner.new
+
+if list
+  %w{scms pre_install}.each do |thingy|
+    puts "All #{thingy}:"
+    deployaml.send('all_' + thingy).each do |elem|
+      puts "\t#{elem}"
+    end
+    puts "\n"
+  end
+else
+  deployaml.go!
+end

@@ -13,7 +13,7 @@ describe Deployaml do
     YAML.should_receive(:load_file).and_return([{
             'name' => 'remote to remote',
             'repository' => {
-                    'path' => 'http://github.com/moowahaha/deployaml.git',
+                    'path' => 'http://github.com/moowahaha/tennis_kata_no_ifs.git',
                     'scm' => 'git'
             },
             'destinations' => [
@@ -30,10 +30,10 @@ describe Deployaml do
   end
 
   it "should deploy to a timestamped destination" do
-    @session.exec!('file /tmp/test_deployment/releases/20100901200900/README.rdoc').should =~ /ASCII English text/
+    @session.exec!('file /tmp/test_deployment/releases/20100901200900/README').should =~ /ASCII English text/
   end
 
   it "should have a current symlink to the destination" do
-    @session.exec!('file /tmp/test_deployment/current/README.rdoc').should =~ /ASCII English text/
+    @session.exec!('file /tmp/test_deployment/current/README').should =~ /ASCII English text/
   end
 end

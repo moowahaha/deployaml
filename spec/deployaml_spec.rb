@@ -37,6 +37,16 @@ describe Deployaml do
     Deployaml::Runner.new.go!
   end
 
+  context "lists" do
+    it "should provide a list of source control systems" do
+      Deployaml::Runner.new.all_scms.should == %w{filesystem git}
+    end
+
+    it "should provide a list of pre-install tasks" do
+      Deployaml::Runner.new.all_pre_install.should == %w{minify write_string_to_file}
+    end
+  end
+
   context "pre install tasks" do
     it "should run specified tasks" do
       contents = rand
