@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml')
 require 'git'
 
 describe Deployaml do
@@ -8,8 +8,8 @@ describe Deployaml do
         FileUtils.rm_r(dir) if File.exists?(dir)
       end
 
-      FileUtils.cp_r(File.dirname(__FILE__) + '/../fixtures/local_git_deployment_test_repo/', '/tmp/', :remove_destination => true)
-      FileUtils.cd(File.dirname(__FILE__) + '/../fixtures/local_git_deployment_test_project/')
+      FileUtils.cp_r(File.dirname(__FILE__) + '/../../fixtures/local_git_deployment_test_repo/', '/tmp/', :remove_destination => true)
+      FileUtils.cd(File.dirname(__FILE__) + '/../../fixtures/local_git_deployment_test_project/')
 
       fake_now = 'current time'
       Time.should_receive(:now).and_return(fake_now)

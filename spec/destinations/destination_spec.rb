@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml')
 
 describe Deployaml::Destination do
   it "should throw a wobbler when no path is specified" do
@@ -40,7 +40,7 @@ describe Deployaml::Destination do
       fake_time.should_receive(:strftime).with('%Y%M%d%H%M%S').and_return('20100901200900')
 
       destination = Deployaml::Destination.new('path' => @destination_dir)
-      destination.install_from "#{File.dirname(__FILE__)}/../fixtures/local_deployment_test_project"
+      destination.install_from "#{File.dirname(__FILE__)}/../../fixtures/local_deployment_test_project"
     end
 
     it "should copy a staging directory to a release directory" do

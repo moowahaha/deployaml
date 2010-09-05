@@ -1,12 +1,12 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml')
 
 describe Deployaml do
   context "local filesystem deployment" do
     before(:all) do
       FileUtils.rm_r('/tmp/local_deployment_test_project_destination') if File.exists?('/tmp/local_deployment_test_project_destination')
-      FileUtils.cp_r(File.dirname(__FILE__) + '/../fixtures/local_deployment_test_project', '/tmp/', :remove_destination => true)
+      FileUtils.cp_r(File.dirname(__FILE__) + '/../../fixtures/local_deployment_test_project', '/tmp/', :remove_destination => true)
 
-      FileUtils.cd(File.dirname(__FILE__) + '/../fixtures/local_deployment_test_project')
+      FileUtils.cd(File.dirname(__FILE__) + '/../../fixtures/local_deployment_test_project')
 
       fake_now = 'current time'
       Time.should_receive(:now).and_return(fake_now)

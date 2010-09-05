@@ -1,9 +1,9 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml')
 
 describe Deployaml do
   before(:all) do
         destination_host = YAML.load_file(
-            File.dirname(__FILE__) + '/../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml'
+            File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml'
     )
 
     fake_time = mock('time')

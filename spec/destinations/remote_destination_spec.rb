@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'deployaml')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml')
 
 describe Deployaml::RemoteDestination do
   it "should throw a wobbler when no host is supplied" do
@@ -18,7 +18,7 @@ describe Deployaml::RemoteDestination do
   end
 
   it "should open an ssh session on a remote host" do
-    remote = YAML.load_file(File.dirname(__FILE__) + '/../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
+    remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
 
     destination = Deployaml::Destination.new(
             {
@@ -30,7 +30,7 @@ describe Deployaml::RemoteDestination do
   end
 
   it "should copy files" do
-    remote = YAML.load_file(File.dirname(__FILE__) + '/../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
+    remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
     session = Net::SSH.start(remote['host'], remote['username'])
 
     %w{  /tmp/local_destination_spec.tmp.a /tmp/local_destination_spec.tmp.b  }.each do |file|
@@ -46,7 +46,7 @@ describe Deployaml::RemoteDestination do
   context "shell commands" do
     before(:all) do
       @remote = YAML.load_file(
-              File.dirname(__FILE__) + '/../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml'
+              File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml'
       )
 
       @destination = Deployaml::Destination.new(
