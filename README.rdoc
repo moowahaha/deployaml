@@ -4,23 +4,57 @@
 
 == DESCRIPTION:
 
-FIX (describe your package)
+YAML based deployment framework for your code.
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* Currently only deploys files and optionally minifies
+* No post install tasks (particularly those useful for Rails)
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+To deploy your code using the deplo.yml file in the current directory:
+
+  $ deployaml
+
+To list the available tasks and source control systems:
+
+  $ deployaml --list
+
+To view help:
+
+  $ deployaml --help
+
+Example of very simple deplo.yml (with minification of CSS & JS):
+
+  - name: my deployment
+    repository:
+      path: username@source-host.com:/path/to/git/project
+      scm: git
+    pre_install:
+      - task: minify
+
+    destinations:
+      - path: /path/to/where/your/code/is/run
+        host: destination-host.com
+        username: destination_username
+
+This will deploy the source code from source-host.com:/path/to/git/project, minify
+the CSS and JavaScript and pop the resulting code in
+destination-host.com:/path/to/where/your/code/is/run/releases/YYMMDDHHSS with a
+corresponding symbolic link
+destination-host.com:/path/to/where/your/code/is/run/releases/current
+
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+* highline
+* net-ssh
+* net-scp
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* sudo gem install deployaml
 
 == DEVELOPERS:
 
@@ -30,6 +64,24 @@ After checking out the source, run:
 
 This task will install any missing dependencies, run the tests/specs,
 and generate the RDoc.
+
+Before you can run your tests cleanly, you will need to create two yaml
+files in the "stuff_not_to_be_committed" directory. One called
+"host_and_username_and_password.yml" containing the following
+(replacing "PUTSOMETHINGHERE"):
+
+  host: PUTSOMETHINGHERE
+  username: PUTSOMETHINGHERE
+  password: PUTSOMETHINGHERE
+
+And another called "host_and_username_with_ssh_keys.yml" containing the following:
+
+  host: PUTSOMETHINGHERE
+  username: PUTSOMETHINGHERE
+
+For this, you will need to setup some ssh keys so you are not prompted for a password.
+
+IMPORTANT!! Needless to say, you should never commit these files!!
 
 == LICENSE:
 
