@@ -31,6 +31,7 @@ module Deployaml
     end
 
     def copy from, to
+      puts "Copying #{from} => #{to}"
       FileUtils.cp_r(from, to)
     end
 

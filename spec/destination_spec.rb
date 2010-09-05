@@ -18,7 +18,7 @@ describe Deployaml::Destination do
   end
 
   it "should delegate file movements" do
-    fake_time = mock('time')    
+    fake_time = mock('time')
     Time.stub(:now).and_return(fake_time)
     fake_time.stub(:strftime).with('%Y%M%d%H%M%S').and_return('20100901200900')
 

@@ -29,6 +29,20 @@ describe Deployaml::RemoteDestination do
     destination.exec('whoami').should == remote['username'] + "\n"
   end
 
+  it "should copy files" do
+    remote = YAML.load_file(File.dirname(__FILE__) + '/../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
+    session = Net::SSH.start(remote['host'], remote['username'])
+
+    %w{  /tmp/local_destination_spec.tmp.a /tmp/local_destination_spec.tmp.b  }.each do |file|
+      session.exec!("rm -fr #{file}")
+    end
+
+    session.exec('touch /tmp/local_destination_spec.tmp.a')
+
+    Deployaml::RemoteDestination.new(remote).copy('/tmp/local_destination_spec.tmp.a', '/tmp/local_destination_spec.tmp.b')
+    session.exec!('file /tmp/local_destination_spec.tmp.b').should =~ /empty/
+  end
+
   context "shell commands" do
     before(:all) do
       @remote = YAML.load_file(
