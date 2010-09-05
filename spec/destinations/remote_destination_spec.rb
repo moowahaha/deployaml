@@ -29,6 +29,20 @@ describe Deployaml::RemoteDestination do
     destination.exec('whoami').should == remote['username'] + "\n"
   end
 
+  it "should prompt for a password when you have no keys" do
+    remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_and_password.yml')
+
+    HighLine.should_receive(:ask).with("#{remote['username']}@#{remote['host']}'s password: ").and_return(remote['password'])
+
+    destination = Deployaml::Destination.new(
+            {
+                    'path' => '/tmp/blah'
+            }.merge(remote)
+    )
+
+    destination.exec('whoami').should == remote['username'] + "\n"
+  end
+
   it "should copy files" do
     remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
     session = Net::SSH.start(remote['host'], remote['username'])

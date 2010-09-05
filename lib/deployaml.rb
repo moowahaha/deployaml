@@ -23,6 +23,7 @@ module Deployaml
 
     def go!
       deployments.each do |deployment|
+        puts "Deploying #{deployment.name}"
         scm = concrete_scm(deployment)
         scm.stage(deployment)
 

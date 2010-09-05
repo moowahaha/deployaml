@@ -1,5 +1,6 @@
 require 'net/ssh'
 require 'net/scp'
+require 'highline'
 
 module Deployaml
   class RemoteDestination
@@ -40,7 +41,7 @@ module Deployaml
         last_status_length  = status_string.length
         print status_string
       end
-      
+
       puts "\n"
 
     end
@@ -51,7 +52,25 @@ module Deployaml
       @host = params['host']
       @username = params['username']
 
-      @session = Net::SSH.start(@host, @username)
+      begin
+        @session = connect_without_password
+      rescue Net::SSH::AuthenticationFailed
+        @session = connect_with_password
+      end
+    end
+
+    def connect_without_password
+      Net::SSH.start(@host, @username)
+    end
+
+    def connect_with_password
+      Net::SSH.start(
+              @host,
+              @username,
+              :password => HighLine.ask(
+                      "#{@username}@#{@host}'s password: "
+              )
+      )
     end
 
   end
