@@ -32,7 +32,9 @@ describe Deployaml::RemoteDestination do
   it "should prompt for a password when you have no keys" do
     remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_and_password.yml')
 
-    HighLine.should_receive(:ask).with("#{remote['username']}@#{remote['host']}'s password: ").and_return(remote['password'])
+    highline = mock('highline')
+    HighLine.stub(:new).and_return(highline)
+    highline.should_receive(:ask).with("#{remote['username']}@#{remote['host']}'s password: ").and_return(remote['password'])
 
     destination = Deployaml::Destination.new(
             {
@@ -43,11 +45,22 @@ describe Deployaml::RemoteDestination do
     destination.exec('whoami').should == remote['username'] + "\n"
   end
 
+  it "should use the current username by default" do
+    remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
+
+    highline = mock('highline')
+    HighLine.stub(:new).and_return(highline)
+    highline.stub(:ask).and_return('xyz')
+
+    ENV['USER'] = 'bork'
+    lambda{ Deployaml::RemoteDestination.new('host' => remote['host']) }.should raise_error(Net::SSH::AuthenticationFailed)
+  end
+
   it "should copy files" do
     remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
     session = Net::SSH.start(remote['host'], remote['username'])
 
-    %w{  /tmp/local_destination_spec.tmp.a /tmp/local_destination_spec.tmp.b  }.each do |file|
+    %w{    /tmp/local_destination_spec.tmp.a /tmp/local_destination_spec.tmp.b    }.each do |file|
       session.exec!("rm -fr #{file}")
     end
 

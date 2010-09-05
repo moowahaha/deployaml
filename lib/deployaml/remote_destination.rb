@@ -50,7 +50,7 @@ module Deployaml
 
     def ssh_connect params
       @host = params['host']
-      @username = params['username']
+      @username = params['username'] || ENV['USER']
 
       begin
         @session = connect_without_password
@@ -67,9 +67,9 @@ module Deployaml
       Net::SSH.start(
               @host,
               @username,
-              :password => HighLine.ask(
+              :password => HighLine.new.ask(
                       "#{@username}@#{@host}'s password: "
-              )
+              ) {|a| a.echo = false}
       )
     end
 
