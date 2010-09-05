@@ -8,9 +8,9 @@ module Deployaml
                 '..', '..', '..', 'vendor', 'yuicompressor', 'build', 'yuicompressor-2.4.2.jar'
         )
         
-        base_pattern = File.join(deployment.staging_path, '**')
+        base_pattern = [deployment.staging_path, '**']
 
-        [Dir.glob(base_pattern + '*.js'), Dir.glob(base_pattern + '*.css')].each do |file|
+        [Dir.glob(File.join(base_pattern + ['*.js'])), Dir.glob(File.join(base_pattern + ['*.css']))].each do |file|
           puts "Minifying #{file}"
           `java -jar #{yui_jar} #{file} -o #{file}`
         end

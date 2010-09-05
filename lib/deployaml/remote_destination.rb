@@ -5,15 +5,19 @@ require 'highline'
 module Deployaml
   class RemoteDestination
     def initialize params
-      params['host'] || raise('A remote host must be specified')
-      ssh_connect(params)
+      @host = params['host'] || raise('A remote host must be specified')
+      @username = params['username'] || ENV['USER']
+    end
+
+    def session
+      @session_not_to_ever_be_called_directly ||= ssh_connect
     end
 
     def execute_and_verify(command, extra_command, ok_message)
       had_error = true
       output = ''
 
-      @session.exec!(command + extra_command) do |ch, stream, data|
+      session.exec!(command + extra_command) do |ch, stream, data|
         if stream == :stderr
           $stderr.print data
           output += data
@@ -34,7 +38,7 @@ module Deployaml
       puts "Copying #{from} #{@username}@#{@host}:#{to}"
 
       last_status_length = 0
-      @session.scp.upload!(from, to, :recursive => true) do |ch, name, sent, total|
+      session.scp.upload!(from, to, :recursive => true) do |ch, name, sent, total|
 
         status_string = "#{sent}/#{total}"
         print "\b" * last_status_length
@@ -48,14 +52,11 @@ module Deployaml
 
     private
 
-    def ssh_connect params
-      @host = params['host']
-      @username = params['username'] || ENV['USER']
-
+    def ssh_connect
       begin
-        @session = connect_without_password
+        connect_without_password
       rescue Net::SSH::AuthenticationFailed
-        @session = connect_with_password
+        connect_with_password
       end
     end
 
