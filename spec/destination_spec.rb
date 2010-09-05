@@ -17,6 +17,19 @@ describe Deployaml::Destination do
     Deployaml::Destination.new('path' => '/tmp/blah').exec('command')
   end
 
+  it "should delegate file movements" do
+    fake_time = mock('time')    
+    Time.stub(:now).and_return(fake_time)
+    fake_time.stub(:strftime).with('%Y%M%d%H%M%S').and_return('20100901200900')
+
+    fake_destination = mock('destination')
+    Deployaml::LocalDestination.stub(:new).and_return(fake_destination)
+    fake_destination.stub(:execute_and_verify).and_return([false, 'cool'])
+    fake_destination.should_receive(:copy).with("/tmp/blah", "/tmp/blah/releases/20100901200900")
+
+    Deployaml::Destination.new('path' => '/tmp/blah').install_from('/tmp/blah')
+  end
+
   context "installing" do
     before do
       @destination_dir = '/tmp/destination_spec_test_dir'

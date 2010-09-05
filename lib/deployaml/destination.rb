@@ -17,7 +17,8 @@ module Deployaml
       current_symlink = File.join(path, 'current')
 
       # TODO: replace this with a @delegatee.copy
-      FileUtils.cp_r(local_path, destination_path)
+      @delegatee.copy(local_path, destination_path)
+      #FileUtils.cp_r(local_path, destination_path)
 
       exec("rm -f #{current_symlink}")
       exec("ln -s #{destination_path} #{current_symlink}")

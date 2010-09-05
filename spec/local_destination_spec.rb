@@ -4,7 +4,18 @@ describe Deployaml::LocalDestination do
   it "should delegate to a local destination when there is no host" do
     Deployaml::LocalDestination.should_receive(:new).with('path' => '/tmp/blah')
     Deployaml::Destination.new('path' => '/tmp/blah')
-  end  
+  end
+
+  it "should copy files" do
+    %w{ /tmp/local_destination_spec.tmp.a /tmp/local_destination_spec.tmp.b }.each do |file|
+      FileUtils.rm(file) if File.exists?(file)
+    end
+
+    FileUtils.touch('/tmp/local_destination_spec.tmp.a')
+
+    Deployaml::LocalDestination.new({}).copy('/tmp/local_destination_spec.tmp.a', '/tmp/local_destination_spec.tmp.b')
+    File.should exist('/tmp/local_destination_spec.tmp.b')
+  end
 
   context "shell commands" do
     before do

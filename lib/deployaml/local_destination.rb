@@ -30,5 +30,9 @@ module Deployaml
       return had_error, output
     end
 
+    def copy from, to
+      FileUtils.cp_r(from, to)
+    end
+
   end
 end
