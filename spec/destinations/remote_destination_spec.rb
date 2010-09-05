@@ -53,7 +53,8 @@ describe Deployaml::RemoteDestination do
     highline.stub(:ask).and_return('xyz')
 
     ENV['USER'] = 'bork'
-    lambda{ Deployaml::RemoteDestination.new('host' => remote['host']) }.should raise_error(Net::SSH::AuthenticationFailed)
+    dest = Deployaml::Destination.new('host' => remote['host'], 'path' => '/tmp/bob')
+    lambda{ dest.exec('pwd') }.should raise_error(Net::SSH::AuthenticationFailed)
   end
 
   it "should copy files" do
