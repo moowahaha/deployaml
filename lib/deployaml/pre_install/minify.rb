@@ -10,7 +10,7 @@ module Deployaml
         
         base_pattern = [deployment.staging_path, '**']
 
-        [Dir.glob(File.join(base_pattern + ['*.js'])), Dir.glob(File.join(base_pattern + ['*.css']))].each do |file|
+        [Dir.glob(File.join(base_pattern + ['*.js'])), Dir.glob(File.join(base_pattern + ['*.css']))].flatten.each do |file|
           puts "Minifying #{file}"
           `java -jar #{yui_jar} #{file} -o #{file}`
         end
