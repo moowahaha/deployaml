@@ -3,7 +3,7 @@ module Deployaml
     class PendingMigrations
 
       def run deployment, destination, params
-        destination.exec("cd #{destination.live_path} && rake db:migrate")
+        destination.exec("RAILS_ENV=production cd #{destination.live_path} && rake db:migrate")
       end
 
     end
