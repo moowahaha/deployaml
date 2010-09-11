@@ -65,13 +65,24 @@ module Deployaml
     end
 
     def connect_with_password
+      flush_stdin
       Net::SSH.start(
               @host,
               @username,
               :password => HighLine.new.ask(
                       "#{@username}@#{@host}'s password: "
-              ) {|a| a.echo = false}
+              ) { |a| a.echo = false }
       )
+    end
+
+    def flush_stdin
+      begin
+        require 'fcntl'
+        STDIN.fcntl(Fcntl::F_SETFL, Fcntl::O_NONBLOCK)
+        STDIN.read
+      rescue
+        #
+      end
     end
 
   end
