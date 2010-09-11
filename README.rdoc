@@ -8,8 +8,8 @@ YAML based deployment framework for your code.
 
 == FEATURES/PROBLEMS:
 
-* Currently only deploys files and optionally minifies
-* No post install tasks (particularly those useful for Rails)
+* If a repo is used more than once, it will be cloned more than once (annoying)
+* Not compressing remote file transfer (slow)
 
 == SYNOPSIS:
 
