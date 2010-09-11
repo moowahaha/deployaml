@@ -14,7 +14,7 @@ module Deployaml
     def install_from local_path
       exec("mkdir -p #{File.join(path, 'releases')}")
 
-      destination_path = File.join(path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
+      destination_path = File.join(path, 'releases', Time.now.strftime('%Y%m%d%H%M%S'))
 
       # TODO: replace this with a @delegatee.copy
       @delegatee.copy(local_path, destination_path)

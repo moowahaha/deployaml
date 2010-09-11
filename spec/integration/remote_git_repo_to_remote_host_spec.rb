@@ -8,7 +8,7 @@ describe Deployaml do
 
     fake_time = mock('time')
     Time.stub(:now).and_return(fake_time)
-    fake_time.stub(:strftime).with('%Y%M%d%H%M%S').and_return('20100901200900')
+    fake_time.stub(:strftime).with('%Y%m%d%H%M%S').and_return('20100901200900')
 
     YAML.should_receive(:load_file).and_return([{
             'name' => 'remote to remote',

@@ -24,7 +24,7 @@ describe Deployaml::Destination do
   it "should delegate file movements" do
     fake_time = mock('time')
     Time.stub(:now).and_return(fake_time)
-    fake_time.stub(:strftime).with('%Y%M%d%H%M%S').and_return('20100901200900')
+    fake_time.stub(:strftime).with('%Y%m%d%H%M%S').and_return('20100901200900')
 
     fake_destination = mock('destination')
     Deployaml::LocalDestination.stub(:new).and_return(fake_destination)
@@ -41,7 +41,7 @@ describe Deployaml::Destination do
 
       fake_time = mock('time')
       Time.should_receive(:now).and_return(fake_time)
-      fake_time.should_receive(:strftime).with('%Y%M%d%H%M%S').and_return('20100901200900')
+      fake_time.should_receive(:strftime).with('%Y%m%d%H%M%S').and_return('20100901200900')
 
       destination = Deployaml::Destination.new('path' => @destination_dir)
       destination.install_from "#{File.dirname(__FILE__)}/../../fixtures/local_deployment_test_project"

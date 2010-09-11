@@ -13,7 +13,7 @@ describe Deployaml do
 
       fake_now = 'current time'
       Time.should_receive(:now).and_return(fake_now)
-      fake_now.should_receive(:strftime).with('%Y%M%d%H%M%S').and_return '20105726195752'
+      fake_now.should_receive(:strftime).with('%Y%m%d%H%M%S').and_return '20105726195752'
 
       Deployaml::Runner.new.go!
     end
