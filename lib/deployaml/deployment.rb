@@ -5,7 +5,7 @@ require File.join(File.dirname(__FILE__), 'remote_destination')
 
 module Deployaml
   class Deployment
-    attr_reader :scm, :name, :repository_path, :staging_path, :pre_install_tasks, :destinations
+    attr_reader :scm, :name, :repository_path, :staging_path, :pre_install_tasks, :post_install_tasks, :destinations
 
     def initialize params
       validate params
@@ -14,6 +14,7 @@ module Deployaml
       @name = params['name']
       @repository_path = params['repository']['path']
       @pre_install_tasks = params['pre_install']
+      @post_install_tasks = params['post_install']
 
       initialize_destinations(params)
       construct_stage

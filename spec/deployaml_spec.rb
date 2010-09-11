@@ -39,11 +39,15 @@ describe Deployaml do
 
   context "lists" do
     it "should provide a list of source control systems" do
-      Deployaml::Runner.new.all_scms.should == %w{filesystem git}
+      Deployaml::Runner.new.all_scms.should == %w{   filesystem git   }
     end
 
     it "should provide a list of pre-install tasks" do
-      Deployaml::Runner.new.all_pre_install.should == %w{minify write_string_to_file}
+      Deployaml::Runner.new.all_pre_install.should == %w{   minify write_string_to_file   }
+    end
+
+    it "should provide a list of post-install tasks" do
+      Deployaml::Runner.new.all_post_install.should == %w{  pending_migrations restart_passenger   }
     end
   end
 
@@ -74,6 +78,31 @@ describe Deployaml do
 
       File.read("#{Dir.tmpdir}/deployaml/local_deployment_test_project/blah.txt").should == contents.to_s
       File.read('/tmp/local_deployment_test_project_destination/current/blah.txt').should == contents.to_s
+    end
+
+    context "post install tasks" do
+      it "should run specified tasks" do
+        contents = rand
+
+        YAML.should_receive(:load_file).and_return([{
+                'name' => 'aa',
+                'repository' => {'path' => '/tmp/local_deployment_test_project'},
+                'post_install' => [
+                        {
+                                'task' => 'restart_passenger'
+                        }
+                ],
+                'destinations' => [
+                        {
+                                'path' => '/tmp/local_deployment_test_project_destination'
+                        }
+                ]
+        }])
+
+        Deployaml::Runner.new.go!
+
+        File.should exist('/tmp/local_deployment_test_project_destination/current/tmp/restart.txt')
+      end
     end
 
     it "should raise an error if it does not know of a pre-install task" do

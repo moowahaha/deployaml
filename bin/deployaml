@@ -40,7 +40,7 @@ end
 deployaml = Deployaml::Runner.new
 
 if list
-  %w{scms pre_install}.each do |thingy|
+  %w{scms pre_install post_install}.each do |thingy|
     puts "All #{thingy}:"
     deployaml.send('all_' + thingy).each do |elem|
       puts "\t#{elem}"

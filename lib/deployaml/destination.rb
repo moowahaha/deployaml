@@ -1,9 +1,10 @@
 module Deployaml
   class Destination
-    attr_reader :path
+    attr_reader :path, :live_path
 
     def initialize params
       @path = params['path'] || raise("A destination path must be specified")
+      @live_path = File.join(path, 'current')
 
       @delegatee = params.has_key?('host') ?
               Deployaml::RemoteDestination.new(params) :
@@ -14,14 +15,13 @@ module Deployaml
       exec("mkdir -p #{File.join(path, 'releases')}")
 
       destination_path = File.join(path, 'releases', Time.now.strftime('%Y%M%d%H%M%S'))
-      current_symlink = File.join(path, 'current')
 
       # TODO: replace this with a @delegatee.copy
       @delegatee.copy(local_path, destination_path)
       #FileUtils.cp_r(local_path, destination_path)
 
-      exec("rm -f #{current_symlink}")
-      exec("ln -s #{destination_path} #{current_symlink}")
+      exec("rm -f #{live_path}")
+      exec("ln -s #{destination_path} #{live_path}")
     end
 
     def exec command
@@ -31,7 +31,7 @@ module Deployaml
 
       puts "$ #{command}"
       had_error, output = @delegatee.execute_and_verify(command, extra_command, ok_message)
-      puts "\n"      
+      puts "\n"
 
       raise "Error executing '#{command}'" if had_error
 

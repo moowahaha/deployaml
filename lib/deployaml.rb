@@ -11,6 +11,7 @@ module Deployaml
     def initialize
       load_scm
       load_pre_install_tasks
+      load_post_install_tasks
     end
 
     def all_scms
@@ -19,6 +20,10 @@ module Deployaml
 
     def all_pre_install
       @pre_install.keys.sort
+    end
+
+    def all_post_install
+      @post_install.keys.sort
     end
 
     def go!
@@ -31,6 +36,7 @@ module Deployaml
 
         deployment.destinations.each do |destination|
           destination.install_from deployment.staging_path
+          run_post_install_tasks(deployment, destination)          
         end
       end
     end
@@ -68,12 +74,25 @@ module Deployaml
       @pre_install = children_of 'PreInstall'
     end
 
+    def load_post_install_tasks
+      @post_install = children_of 'PostInstall'
+    end
+
     def run_pre_install_tasks deployment
       return if deployment.pre_install_tasks.nil? || deployment.pre_install_tasks.empty?
 
       deployment.pre_install_tasks.each do |task|
         task_klass = find_class_from_collection(@pre_install, 'pre_install', task['task'], deployment)
         task_klass.run(deployment, task['parameters'])
+      end
+    end
+
+    def run_post_install_tasks deployment, destination
+      return if deployment.post_install_tasks.nil? || deployment.post_install_tasks.empty?
+
+      deployment.post_install_tasks.each do |task|
+        task_klass = find_class_from_collection(@post_install, 'post_install', task['task'], deployment)
+        task_klass.run(deployment, destination, task['parameters'])
       end
     end
 

@@ -9,6 +9,10 @@ describe Deployaml::Destination do
     Deployaml::Destination.new('path' => '/tmp/blah').path.should == '/tmp/blah'
   end
 
+  it "should have a live path" do
+    Deployaml::Destination.new('path' => '/tmp/blah').live_path.should == '/tmp/blah/current'
+  end
+
   it "should delegate shell executions" do
     fake_destination = mock('destination')
     Deployaml::LocalDestination.stub(:new).and_return(fake_destination)
