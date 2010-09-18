@@ -17,10 +17,6 @@ To deploy your code using the deplo.yml file in the current directory:
 
   $ deployaml
 
-To list the available tasks and source control systems:
-
-  $ deployaml --list
-
 To view help:
 
   $ deployaml --help
