@@ -35,17 +35,10 @@ module Deployaml
     end
 
     def copy from, to
-      puts "Copying #{from} #{@username}@#{@host}:#{to}"
       compressed_file = compress(from, to)
+      puts "Copying #{from} #{@username}@#{@host}:#{to}"
 
-      last_status_length = 0
-      session.scp.upload!(compressed_file, to, :recursive => true) do |ch, name, sent, total|
-
-        status_string = "#{sent}/#{total}"
-        print "\b" * last_status_length
-        last_status_length  = status_string.length
-        print status_string
-      end
+      session.scp.upload!(compressed_file, to)
 
       decompress(to)
 
