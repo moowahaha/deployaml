@@ -1,26 +1,29 @@
 #!/usr/bin/env ruby
-# == Synopsis
-#
-# deployaml: deploys your project using the details from a deplo.yml file in the current directory
-#
-# == Usage
-#
-# deployaml [OPTION]
-#
-# -h, --help
-#    show help
-#
-# -v [version], --version=[version]
-#    deploy a given version of the code
-#
-# -t, --tasks
-#    list available pre install tasks, post install tasks
-#
-# -s, --scms
-#    list available source control systems
-#
-# -d, --deployments
-#    lists the deployments from your deplo.yml file
+
+$usage = %Q{
+ == Synopsis
+
+ deployaml: deploys your project using the details from a deplo.yml file in the current directory
+
+ == Usage
+
+ deployaml [OPTION]
+
+ -h, --help
+    show help and exit
+
+ -v VERSION, --version=VERSION
+    deploy a given version of the code (such as a tag)
+
+ -t, --tasks
+    list available pre and post install tasks and exit
+
+ -s, --scms
+    list available source control systems and exit
+
+ -d, --deployments
+    lists the deployments from your deplo.yml file and exit
+}
 
 $:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
 
@@ -30,7 +33,7 @@ require 'deployaml'
 
 
 def list_tasks deployaml
-  %w{  pre_install post_install  }.each do |thingy|
+  %w{   pre_install post_install   }.each do |thingy|
     puts "All #{thingy}:"
     deployaml.send('all_' + thingy).each do |elem|
       puts "\t#{elem}"
@@ -61,6 +64,19 @@ def list_deployments deployaml
   exit(0)
 end
 
+def show_usage
+  markup = SM::SimpleMarkup.new
+  flow_convertor = SM::ToFlow.new
+
+  flow = markup.convert($usage, flow_convertor)
+
+  options = RI::Options.instance
+  formatter = options.formatter.new(options, "")
+  formatter.display_flow(flow)
+
+  exit(0)
+end
+
 opts = GetoptLong.new(
         ['--help', '-h', GetoptLong::NO_ARGUMENT],
         ['--tasks', '-l', GetoptLong::NO_ARGUMENT],
@@ -75,8 +91,7 @@ version = nil
 opts.each do |opt, arg|
   case opt
     when '--help'
-      RDoc::usage
-      exit 0
+      show_usage
     when '--tasks'
       list_tasks(deployaml)
     when '--scms'
