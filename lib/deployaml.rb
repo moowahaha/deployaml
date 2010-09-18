@@ -9,6 +9,7 @@ module Deployaml
     VERSION = '0.0'
 
     def initialize
+      load_deployments
       load_scm
       load_pre_install_tasks
       load_post_install_tasks
@@ -26,8 +27,14 @@ module Deployaml
       @post_install.keys.sort
     end
 
+    def available_deployments
+      @deployments.sort {|a, b| a.name <=> b.name}.map do |deployment|
+        "#{deployment.name} (from #{deployment.scm})"
+      end
+    end
+
     def go!
-      deployments.each do |deployment|
+      @deployments.each do |deployment|
         puts "Deploying #{deployment.name}"
         scm = concrete_scm(deployment)
         scm.stage(deployment)
@@ -96,10 +103,11 @@ module Deployaml
       end
     end
 
-    def deployments
+    def load_deployments
       yaml_file = File.join(Dir.pwd, 'deplo.yml')
       raise "Cannot find deployment YAML file #{yaml_file}" unless File.exists?(yaml_file)
-      YAML.load_file(yaml_file).map {|d| Deployaml::Deployment.new(d) }.compact
+      yaml = YAML.load_file(yaml_file)
+      @deployments = yaml ? yaml.map {|d| Deployaml::Deployment.new(d) }.compact : []
     end
   end
 end

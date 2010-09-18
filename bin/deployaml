@@ -2,7 +2,7 @@
 
 # == Synopsis
 #
-# deployaml: deploys your project using the details form a deplo.yml file in the current directory
+# deployaml: deploys your project using the details from a deplo.yml file in the current directory
 #
 # == Usage
 #
@@ -11,8 +11,14 @@
 # -h, --help:
 #    show help
 #
-# -l --list:
-#    list available pre install tasks, post install tasks and source control systems
+# -t, --tasks:
+#    list available pre install tasks, post install tasks
+#
+# -s, --scms:
+#    list available source control systems
+#
+# -d, --deployments
+#    lists the deployments from your deplo.yml file
 
 $:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
 
@@ -20,33 +26,61 @@ require 'getoptlong'
 require 'rdoc/usage'
 require 'deployaml'
 
-opts = GetoptLong.new(
-        ['--help', '-h', GetoptLong::NO_ARGUMENT],
-        ['--list', '-l', GetoptLong::OPTIONAL_ARGUMENT]
-)
 
-list = false
-
-opts.each do |opt, arg|
-  case opt
-    when '--help'
-      RDoc::usage
-      exit 0
-    when '--list'
-      list = true
-  end
-end
-
-deployaml = Deployaml::Runner.new
-
-if list
-  %w{scms pre_install post_install}.each do |thingy|
+def list_tasks deployaml
+  %w{  pre_install post_install  }.each do |thingy|
     puts "All #{thingy}:"
     deployaml.send('all_' + thingy).each do |elem|
       puts "\t#{elem}"
     end
     puts "\n"
   end
-else
-  deployaml.go!
+
+  exit(0)
 end
+
+def list_scms deployaml
+  puts "All scms:"
+  deployaml.all_scms.each do |elem|
+    puts "\t#{elem}"
+  end
+  puts "\n"
+
+  exit(0)
+end
+
+def list_deployments deployaml
+  puts "Available deployments:"
+  deployaml.available_deployments.each do |deployment|
+    puts "\t#{deployment}"
+  end
+  puts "\n"
+
+  exit(0)
+end
+
+opts = GetoptLong.new(
+        ['--help', '-h', GetoptLong::NO_ARGUMENT],
+        ['--tasks', '-l', GetoptLong::NO_ARGUMENT],
+        ['--scms', '-s', GetoptLong::NO_ARGUMENT],
+        ['--deployments', '-d', GetoptLong::NO_ARGUMENT]
+)
+
+deployaml = Deployaml::Runner.new
+
+opts.each do |opt, arg|
+  case opt
+    when '--help'
+      RDoc::usage
+      exit 0
+    when '--tasks'
+      list_tasks(deployaml)
+    when '--scms'
+      list_scms(deployaml)
+    when '--deployments'
+      list_deployments(deployaml)
+  end
+end
+
+deployaml.go!
+
