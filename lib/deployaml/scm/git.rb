@@ -6,7 +6,9 @@ module Deployaml
       def fetch_files
         puts "Cloning #{deployment.repository_path}"
         FileUtils.rm_r(deployment.staging_path) if File.exists?(deployment.staging_path)
-        cloned?(`git clone --depth=1 #{deployment.repository_path} #{deployment.staging_path} 2>&1`)
+        cloned?(`git clone #{deployment.repository_path} #{deployment.staging_path} 2>&1`)
+
+        `cd #{deployment.staging_path} && git checkout #{version}` if version
 
         `cd #{deployment.staging_path} && git submodule init && git submodule update`
       end

@@ -6,7 +6,7 @@ end
 
 module Deployaml
   class Runner
-    VERSION = '0.0'
+    VERSION = '0.1'
 
     def initialize
       load_deployments
@@ -33,11 +33,11 @@ module Deployaml
       end
     end
 
-    def go!
+    def go!(args = {})
       @deployments.each do |deployment|
         puts "Deploying #{deployment.name}"
         scm = concrete_scm(deployment)
-        scm.stage(deployment)
+        scm.stage(deployment, args[:version])
 
         run_pre_install_tasks(deployment)
 

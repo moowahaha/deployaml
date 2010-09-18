@@ -21,4 +21,17 @@ describe Deployaml::Scm::Git do
     File.should exist(deployment.staging_path + '/benjamin.txt')
     File.should_not exist(deployment.staging_path + '/.git/')
   end
+
+  it "should clone a particular version of a git repo" do
+    deployment = Deployaml::Deployment.new(
+            'name' => 'harold',
+            'repository' => {'path' => @example_repo},
+            'destinations' => [{'path' => '/tmp/'}]
+    )
+
+    @scm.stage(deployment, 'with_bob_instead_of_benjamin')
+
+    File.should exist(deployment.staging_path + '/bob.txt')
+    File.should_not exist(deployment.staging_path + '/benjamin.txt')        
+  end
 end

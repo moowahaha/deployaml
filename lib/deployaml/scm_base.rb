@@ -1,9 +1,10 @@
 module Deployaml
   class ScmBase
-    attr_reader :deployment
+    attr_reader :deployment, :version
 
-    def stage deployment
+    def stage deployment, version = nil
       @deployment = deployment
+      @version = version
       fetch_files
       clean
     end

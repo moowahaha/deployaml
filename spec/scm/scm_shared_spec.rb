@@ -22,4 +22,5 @@ shared_examples_for "a source control system" do
 
     File.should_not exist(File.join(deployment.staging_path, File.basename(@example_repo), 'deplo.yml'))
   end
+  
 end

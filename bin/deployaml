@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # == Synopsis
 #
 # deployaml: deploys your project using the details from a deplo.yml file in the current directory
@@ -8,13 +7,16 @@
 #
 # deployaml [OPTION]
 #
-# -h, --help:
+# -h, --help
 #    show help
 #
-# -t, --tasks:
+# -v [version], --version=[version]
+#    deploy a given version of the code
+#
+# -t, --tasks
 #    list available pre install tasks, post install tasks
 #
-# -s, --scms:
+# -s, --scms
 #    list available source control systems
 #
 # -d, --deployments
@@ -63,10 +65,12 @@ opts = GetoptLong.new(
         ['--help', '-h', GetoptLong::NO_ARGUMENT],
         ['--tasks', '-l', GetoptLong::NO_ARGUMENT],
         ['--scms', '-s', GetoptLong::NO_ARGUMENT],
-        ['--deployments', '-d', GetoptLong::NO_ARGUMENT]
+        ['--deployments', '-d', GetoptLong::NO_ARGUMENT],
+        ['--version', '-v', GetoptLong::REQUIRED_ARGUMENT]
 )
 
 deployaml = Deployaml::Runner.new
+version = nil
 
 opts.each do |opt, arg|
   case opt
@@ -79,8 +83,10 @@ opts.each do |opt, arg|
       list_scms(deployaml)
     when '--deployments'
       list_deployments(deployaml)
+    when '--version'
+      version = arg
   end
 end
 
-deployaml.go!
+deployaml.go!(:version => version)
 
