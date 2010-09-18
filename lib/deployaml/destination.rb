@@ -16,9 +16,7 @@ module Deployaml
 
       destination_path = File.join(path, 'releases', Time.now.strftime('%Y%m%d%H%M%S'))
 
-      # TODO: replace this with a @delegatee.copy
       @delegatee.copy(local_path, destination_path)
-      #FileUtils.cp_r(local_path, destination_path)
 
       exec("rm -f #{live_path}")
       exec("ln -s #{destination_path} #{live_path}")

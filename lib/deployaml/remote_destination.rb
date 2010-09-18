@@ -36,9 +36,10 @@ module Deployaml
 
     def copy from, to
       puts "Copying #{from} #{@username}@#{@host}:#{to}"
+      compressed_file = compress(from, to)
 
       last_status_length = 0
-      session.scp.upload!(from, to, :recursive => true) do |ch, name, sent, total|
+      session.scp.upload!(compressed_file, to, :recursive => true) do |ch, name, sent, total|
 
         status_string = "#{sent}/#{total}"
         print "\b" * last_status_length
@@ -46,11 +47,30 @@ module Deployaml
         print status_string
       end
 
+      decompress(to)
+
       puts "\n"
 
     end
 
     private
+
+    def compress from, to
+      puts "Compressing for transfer..."
+      root_directory, to_zip = File.dirname(from), File.basename(to)
+
+      compressed_file = to_zip + '.tgz'
+      `cd #{root_directory} && cp -rf #{from} #{to_zip} && tar -zcf #{compressed_file} #{to_zip}`
+
+      File.join(root_directory, compressed_file)
+    end
+
+    def decompress destination
+      puts "Inflating at destination..."
+      destination_root = File.dirname(destination)
+      compressed_file = File.basename(destination)
+      session.exec!("cd #{destination_root} && tar -zxf #{compressed_file}")
+    end
 
     def ssh_connect
       begin

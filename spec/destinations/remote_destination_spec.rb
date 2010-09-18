@@ -54,18 +54,16 @@ describe Deployaml::RemoteDestination do
 
     ENV['USER'] = 'bork'
     dest = Deployaml::Destination.new('host' => remote['host'], 'path' => '/tmp/bob')
-    lambda{ dest.exec('pwd') }.should raise_error(Net::SSH::AuthenticationFailed)
+    lambda { dest.exec('pwd') }.should raise_error(Net::SSH::AuthenticationFailed)
   end
 
   it "should copy files" do
     remote = YAML.load_file(File.dirname(__FILE__) + '/../../stuff_not_to_be_committed/host_and_username_with_ssh_keys.yml')
     session = Net::SSH.start(remote['host'], remote['username'])
 
-    %w{    /tmp/local_destination_spec.tmp.a /tmp/local_destination_spec.tmp.b    }.each do |file|
-      session.exec!("rm -fr #{file}")
-    end
+    session.exec!("rm -fr /tmp/local_destination_spec.tmp.b")
 
-    session.exec('touch /tmp/local_destination_spec.tmp.a')
+    `touch /tmp/local_destination_spec.tmp.a`
 
     Deployaml::RemoteDestination.new(remote).copy('/tmp/local_destination_spec.tmp.a', '/tmp/local_destination_spec.tmp.b')
     session.exec!('file /tmp/local_destination_spec.tmp.b').should =~ /empty/
