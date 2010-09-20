@@ -8,7 +8,8 @@ module Deployaml
   class Runner
     VERSION = '0.1'
 
-    def initialize
+    def initialize(args = {})
+      load_custom_path(args[:include]) if args[:include]
       load_deployments
       load_scm
       load_pre_install_tasks
@@ -28,7 +29,7 @@ module Deployaml
     end
 
     def available_deployments
-      @deployments.sort {|a, b| a.name <=> b.name}.map do |deployment|
+      @deployments.sort { |a, b| a.name <=> b.name }.map do |deployment|
         "#{deployment.name} (from #{deployment.scm})"
       end
     end
@@ -43,7 +44,7 @@ module Deployaml
 
         deployment.destinations.each do |destination|
           destination.install_from deployment.staging_path
-          run_post_install_tasks(deployment, destination)          
+          run_post_install_tasks(deployment, destination)
         end
       end
     end
@@ -54,7 +55,7 @@ module Deployaml
       classes = {}
 
       Deployaml.const_get(constant).constants.each do |scm|
-        underscore_name = scm.gsub(/[A-Z]/) {|x| '_' + x.downcase}.gsub(/^_/, '')
+        underscore_name = scm.gsub(/[A-Z]/) { |x| '_' + x.downcase }.gsub(/^_/, '')
         classes[underscore_name] = Deployaml.const_get(constant).const_get(scm).new
       end
 
@@ -62,8 +63,8 @@ module Deployaml
     end
 
     def find_class_from_collection collection, nice_collection_type, nice_class, deployment
-      klass = collection.find {|x| x[0] == nice_class}
-      
+      klass = collection.find { |x| x[0] == nice_class }
+
       return klass[1] if klass
 
       raise "Do not know of #{nice_collection_type} '#{nice_class}' for '#{deployment.name}'. Available: #{collection.keys.sort.join(', ')}"
@@ -83,6 +84,12 @@ module Deployaml
 
     def load_post_install_tasks
       @post_install = children_of 'PostInstall'
+    end
+
+    def load_custom_path path
+      Dir.glob(File.join(path, '**', '*.rb')).each do |file|
+        require file
+      end
     end
 
     def run_pre_install_tasks deployment
@@ -107,7 +114,7 @@ module Deployaml
       yaml_file = File.join(Dir.pwd, 'deplo.yml')
       raise "Cannot find deployment YAML file #{yaml_file}" unless File.exists?(yaml_file)
       yaml = YAML.load_file(yaml_file)
-      @deployments = yaml ? yaml.map {|d| Deployaml::Deployment.new(d) }.compact : []
+      @deployments = yaml ? yaml.map { |d| Deployaml::Deployment.new(d) }.compact : []
     end
   end
 end

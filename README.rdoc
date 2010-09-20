@@ -1,6 +1,6 @@
 = deployaml
 
-* http://github.com/moowahaha/deployaml
+* http://www.advancethinking.com/open_source/deployaml
 
 == DESCRIPTION:
 

@@ -31,4 +31,10 @@ describe 'executable' do
       output.should =~ /\tsecond \(from filesystem\)\n/
     end
   end
+
+  it "should load custom handlers from a specified path" do
+    output = run("--tasks --include #{File.dirname(__FILE__) + '/../fixtures/custom_handlers'}")
+    output.should =~ /\texplode\n/
+    output.should =~ /\tfizzle\n/
+  end
 end

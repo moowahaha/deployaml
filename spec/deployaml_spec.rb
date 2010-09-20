@@ -43,15 +43,15 @@ describe Deployaml do
     end
 
     it "should provide a list of source control systems" do
-      Deployaml::Runner.new.all_scms.should == %w{         filesystem git         }
+      Deployaml::Runner.new.all_scms.should == %w{                 filesystem git                 }
     end
 
     it "should provide a list of pre-install tasks" do
-      Deployaml::Runner.new.all_pre_install.should == %w{         minify write_string_to_file         }
+      Deployaml::Runner.new.all_pre_install.should == %w{                 minify write_string_to_file                 }
     end
 
     it "should provide a list of post-install tasks" do
-      Deployaml::Runner.new.all_post_install.should == %w{        pending_migrations restart_passenger         }
+      Deployaml::Runner.new.all_post_install.should == %w{                pending_migrations restart_passenger                 }
     end
 
     it "should provide a list of available deployments" do
@@ -155,23 +155,120 @@ describe Deployaml do
     end
   end
 
-end
+  context "installing" do
+    it "should install to a destination from a staging path" do
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
 
-context "installing" do
-  it "should install to a destination from a staging path" do
-    YAML.should_receive(:load_file).and_return([{
-            'name' => 'aa',
-            'repository' => {'path' => '/tmp/local_deployment_test_project'},
-            'destinations' => [
-                    {
-                            'path' => '/tmp/local_deployment_test_project_destination'
-                    }
-            ]
-    }])
+      fake_destination = mock('destination')
+      Deployaml::Destination.should_receive(:new).and_return(fake_destination)
+      fake_destination.should_receive(:install_from).with(File.join(Dir.tmpdir, 'deployaml', 'local_deployment_test_project'))
+      Deployaml::Runner.new.go!
+    end
 
-    fake_destination = mock('destination')
-    Deployaml::Destination.should_receive(:new).and_return(fake_destination)
-    fake_destination.should_receive(:install_from).with(File.join(Dir.tmpdir, 'deployaml', 'local_deployment_test_project'))
-    Deployaml::Runner.new.go!
+    it "should be able to install particular software versions" do
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
+
+      fake_destination = mock('destination')
+      Deployaml::Destination.stub(:new).and_return(fake_destination)
+      fake_destination.stub(:install_from)
+
+      scm = mock('scm')
+      Deployaml::Scm::Filesystem.should_receive(:new).and_return(scm)
+      scm.should_receive(:stage).with(anything, 'b')
+
+      Deployaml::Runner.new.go!(:version => 'b')
+    end
+  end
+
+  context "custom handlers" do
+    it "should be able to execute custom pre install tasks" do
+
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'pre_install' => [
+                      {
+                              'task' => 'explode'
+                      }
+              ],
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
+
+      runner = Deployaml::Runner.new(
+              :include => File.dirname(__FILE__) + '/../fixtures/custom_handlers'
+      )
+
+      lambda { runner.go! }.should raise_error('kaboom')
+
+      runner.all_pre_install.should include('explode')
+    end
+
+    it "should be able to execute custom post install tasks" do
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {'path' => '/tmp/local_deployment_test_project'},
+              'post_install' => [
+                      {
+                              'task' => 'fizzle'
+                      }
+              ],
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
+
+      runner = Deployaml::Runner.new(
+              :include => File.dirname(__FILE__) + '/../fixtures/custom_handlers'
+      )
+
+      lambda { runner.go! }.should raise_error('fizzle')
+
+      runner.all_post_install.should include('fizzle')
+    end
+
+    it "should be able to use custom source control handling" do
+      YAML.should_receive(:load_file).and_return([{
+              'name' => 'aa',
+              'repository' => {
+                      'path' => '/tmp/local_deployment_test_project',
+                      'scm' => 'moo'
+              },
+              'destinations' => [
+                      {
+                              'path' => '/tmp/local_deployment_test_project_destination'
+                      }
+              ]
+      }])
+
+      runner = Deployaml::Runner.new(
+              :include => File.dirname(__FILE__) + '/../fixtures/custom_handlers'
+      )
+
+      lambda { runner.go! }.should raise_error('MOO!')
+
+      runner.all_scms.should include('moo')
+    end
   end
 end

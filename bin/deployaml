@@ -23,6 +23,9 @@ $usage = %Q{
 
  -d, --deployments
     lists the deployments from your deplo.yml file and exit
+
+ -I DIRECTORY, --include=DIRECTORY
+    path containing custom pre/post install tasks and source control handling
 }
 
 $:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
@@ -33,7 +36,7 @@ require 'deployaml'
 
 
 def list_tasks deployaml
-  %w{   pre_install post_install   }.each do |thingy|
+  %w{    pre_install post_install    }.each do |thingy|
     puts "All #{thingy}:"
     deployaml.send('all_' + thingy).each do |elem|
       puts "\t#{elem}"
@@ -77,15 +80,34 @@ def show_usage
   exit(0)
 end
 
-opts = GetoptLong.new(
-        ['--help', '-h', GetoptLong::NO_ARGUMENT],
-        ['--tasks', '-l', GetoptLong::NO_ARGUMENT],
-        ['--scms', '-s', GetoptLong::NO_ARGUMENT],
-        ['--deployments', '-d', GetoptLong::NO_ARGUMENT],
-        ['--version', '-v', GetoptLong::REQUIRED_ARGUMENT]
+def include_path_from_options(opts)
+  include_path = nil
+
+  remaining_options = []
+  opts.each do |opt, arg|
+    case opt
+      when '--include'
+        include_path = arg
+      else
+        remaining_options << [opt, arg]
+    end
+  end
+
+  return include_path, remaining_options
+end
+
+include_path, opts = include_path_from_options(
+        GetoptLong.new(
+                ['--help', '-h', GetoptLong::NO_ARGUMENT],
+                ['--tasks', '-l', GetoptLong::NO_ARGUMENT],
+                ['--scms', '-s', GetoptLong::NO_ARGUMENT],
+                ['--deployments', '-d', GetoptLong::NO_ARGUMENT],
+                ['--version', '-v', GetoptLong::REQUIRED_ARGUMENT],
+                ['--include', '-I', GetoptLong::REQUIRED_ARGUMENT]
+        )
 )
 
-deployaml = Deployaml::Runner.new
+deployaml = Deployaml::Runner.new(include_path ? {:include => include_path} : {})
 version = nil
 
 opts.each do |opt, arg|
