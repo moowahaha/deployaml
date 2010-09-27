@@ -10,7 +10,7 @@ describe Deployaml::PreInstall::WriteStringToFile do
             'pre_install' => [
                     {
                             'task' => 'write_sting_to_file',
-                            'params' => 'whatever'
+                            'parameters' => 'whatever'
                     }
             ]
     )

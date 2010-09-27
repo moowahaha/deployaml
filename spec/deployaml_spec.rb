@@ -43,15 +43,15 @@ describe Deployaml do
     end
 
     it "should provide a list of source control systems" do
-      Deployaml::Runner.new.all_scms.should == %w{                 filesystem git                 }
+      Deployaml::Runner.new.all_scms.should == %w{                  filesystem git                  }
     end
 
     it "should provide a list of pre-install tasks" do
-      Deployaml::Runner.new.all_pre_install.should == %w{                 minify write_string_to_file                 }
+      Deployaml::Runner.new.all_pre_install.should == %w{                  minify write_string_to_file                  }
     end
 
     it "should provide a list of post-install tasks" do
-      Deployaml::Runner.new.all_post_install.should == %w{                pending_migrations restart_passenger                 }
+      Deployaml::Runner.new.all_post_install.should == %w{                 pending_migrations restart_passenger symlink                 }
     end
 
     it "should provide a list of available deployments" do

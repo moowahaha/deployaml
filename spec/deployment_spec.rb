@@ -74,14 +74,14 @@ describe Deployaml::Deployment do
               'pre_install' => [
                       {
                               'task' => 'harold',
-                              'params' => ['a', 'b']
+                              'parameters' => ['a', 'b']
                       }
               ]
       )
 
       deployment.pre_install_tasks.length.should == 1
       deployment.pre_install_tasks.first['task'].should == 'harold'
-      deployment.pre_install_tasks.first['params'].should == ['a', 'b']
+      deployment.pre_install_tasks.first['parameters'].should == ['a', 'b']
     end
 
   end
