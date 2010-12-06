@@ -1,5 +1,5 @@
 require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml', 'scm', 'git')
-require File.join(File.dirname(__FILE__), 'scm_shared_spec')
+require File.join(File.dirname(__FILE__), 'scm_shared')
 
 describe Deployaml::Scm::Git do
   it_should_behave_like "a source control system"

@@ -1,0 +1,5 @@
+- name: placeholder
+  repository:
+    path: ./fixtures/local_deployment_test_project
+  destinations:
+    - path: /tmp/

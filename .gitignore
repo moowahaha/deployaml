@@ -1,5 +1,5 @@
 .idea/
 reports
 pkg
-/deplo.yml
 stuff_not_to_be_committed
+.bundle/

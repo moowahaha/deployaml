@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'yaml'
 
 Dir.glob(File.join(File.dirname(__FILE__), 'deployaml', '**', '*.rb')).each do |file|
   require file
@@ -55,7 +56,7 @@ module Deployaml
       classes = {}
 
       Deployaml.const_get(constant).constants.each do |scm|
-        underscore_name = scm.gsub(/[A-Z]/) { |x| '_' + x.downcase }.gsub(/^_/, '')
+        underscore_name = scm.to_s.gsub(/[A-Z]/) { |x| '_' + x.downcase }.gsub(/^_/, '')
         classes[underscore_name] = Deployaml.const_get(constant).const_get(scm).new
       end
 

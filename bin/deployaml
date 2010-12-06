@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 
 $usage = %Q{
- == Synopsis
+ Synopsis
 
  deployaml: deploys your project using the details from a deplo.yml file in the current directory
 
- == Usage
+ Usage
 
  deployaml [OPTION]
 
@@ -31,7 +31,6 @@ $usage = %Q{
 $:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
 
 require 'getoptlong'
-require 'rdoc/usage'
 require 'deployaml'
 
 
@@ -68,15 +67,7 @@ def list_deployments deployaml
 end
 
 def show_usage
-  markup = SM::SimpleMarkup.new
-  flow_convertor = SM::ToFlow.new
-
-  flow = markup.convert($usage, flow_convertor)
-
-  options = RI::Options.instance
-  formatter = options.formatter.new(options, "")
-  formatter.display_flow(flow)
-
+  puts $usage
   exit(0)
 end
 

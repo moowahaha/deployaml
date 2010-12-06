@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'deployaml')
 require 'git'
+require 'fileutils'
 
 describe Deployaml do
   context "local git deployment" do
@@ -11,9 +12,9 @@ describe Deployaml do
       FileUtils.cp_r(File.dirname(__FILE__) + '/../../fixtures/local_git_deployment_test_repo/', '/tmp/', :remove_destination => true)
       FileUtils.cd(File.dirname(__FILE__) + '/../../fixtures/local_git_deployment_test_project/')
 
-      fake_now = 'current time'
-      Time.should_receive(:now).and_return(fake_now)
-      fake_now.should_receive(:strftime).with('%Y%m%d%H%M%S').and_return '20105726195752'
+      fake_now = Date.strptime('20101226195752', '%Y%m%d%H%M%S').to_time
+      Time.should_receive(:now).any_number_of_times.and_return(fake_now)
+      fake_now.should_receive(:strftime).with('%Y%m%d%H%M%S').and_return '20101226195752'
 
       Deployaml::Runner.new.go!
     end
