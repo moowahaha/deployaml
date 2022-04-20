@@ -2,11 +2,13 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.2)
-    git (1.2.5)
+    git (1.11.0)
+      rchardet (~> 1.8)
     highline (1.6.1)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-ssh (2.0.23)
+    rchardet (1.8.0)
     rdoc (2.5.11)
     rspec (2.2.0)
       rspec-core (~> 2.2)
@@ -21,9 +23,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  git (>= 1.2.5)
+  git (>= 1.11.0)
   highline (>= 1.6.1)
   net-scp (>= 1.0.3)
   net-ssh (>= 2.0.11)
   rdoc (>= 2.5.11)
   rspec (>= 2.2.0)
+
+BUNDLED WITH
+   2.1.4
